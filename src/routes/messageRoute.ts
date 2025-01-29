@@ -5,7 +5,6 @@ import { Router } from 'express';
 const route = Router();
 export { route as messageRoute };
 
-route.post('/');
 route.get('/', authMiddleware, messageController.getConversations);
 route.get(
   '/:conversationId',

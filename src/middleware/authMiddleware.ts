@@ -4,7 +4,6 @@ import type { RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 export const authMiddleware: RequestHandler = async (req, res, next) => {
-  const userId = req.cookies.userId;
   const deviceFingerprintHeader = req.headers['x-device-fingerprint'];
 
   if (!deviceFingerprintHeader) {
@@ -33,5 +32,4 @@ export const authMiddleware: RequestHandler = async (req, res, next) => {
   res.locals.userId = user.id;
   res.locals.deviceFingerprint = user.deviceFingerprint;
   next();
-  return;
 };

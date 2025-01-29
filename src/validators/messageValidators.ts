@@ -16,3 +16,13 @@ export const firstMessageSchema = z.intersection(
   }),
   createUserSchema
 );
+export type FirstMessageDTO = z.infer<typeof firstMessageSchema>;
+
+export const socketMessageSchema = z.object({
+  conversationId: z.string().trim().min(1, 'Conversation id is required'),
+  receiverId: z.string().trim().min(1, 'Receiver id is required'),
+  contentEncrypted: z.string().trim().min(1, 'Message content is required'),
+  createdAt: z.string().date(),
+});
+
+export type SocketMessageDTO = z.infer<typeof socketMessageSchema>;

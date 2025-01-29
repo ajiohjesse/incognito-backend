@@ -1,4 +1,3 @@
-import '@/services/socketService';
 import { server } from '@/socket';
 import { env } from './utils/env';
 

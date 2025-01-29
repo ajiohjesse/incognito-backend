@@ -2,7 +2,7 @@ import { type Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 type ResponseType = 'success' | 'error';
-type ResponseData = Record<string, unknown>;
+type ResponseData = Record<string, unknown> | null;
 
 interface ApiResponse<T extends ResponseData> {
   type: ResponseType;
