@@ -1,54 +1,9 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
+  "id": "ce9ece2e-fccc-434b-9130-781da5e69ecc",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "username": {
-          "name": "username",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "device_fingerprint": {
-          "name": "device_fingerprint",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "public_key": {
-          "name": "public_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
     "public.conversations": {
       "name": "conversations",
       "schema": "",
@@ -98,10 +53,10 @@
           "columns": [
             {
               "expression": "user1_id",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
+              "opclass": "text_ops"
             }
           ],
           "isUnique": false,
@@ -114,10 +69,10 @@
           "columns": [
             {
               "expression": "user2_id",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
+              "opclass": "text_ops"
             }
           ],
           "isUnique": false,
@@ -131,7 +86,6 @@
           "name": "conversations_user1_id_fkey",
           "tableFrom": "conversations",
           "tableTo": "users",
-          "schemaTo": "public",
           "columnsFrom": [
             "user1_id"
           ],
@@ -145,7 +99,6 @@
           "name": "conversations_user2_id_fkey",
           "tableFrom": "conversations",
           "tableTo": "users",
-          "schemaTo": "public",
           "columnsFrom": [
             "user2_id"
           ],
@@ -159,16 +112,16 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "conversations_user1_id_user2_id_key": {
+          "name": "conversations_user1_id_user2_id_key",
+          "nullsNotDistinct": false,
           "columns": [
             "user1_id",
             "user2_id"
-          ],
-          "nullsNotDistinct": false,
-          "name": "conversations_user1_id_user2_id_key"
+          ]
         }
       },
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.messages": {
@@ -186,16 +139,22 @@
           "name": "conversation_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "sender_id": {
           "name": "sender_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "content_encrypted": {
           "name": "content_encrypted",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryption_iv": {
+          "name": "encryption_iv",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -204,7 +163,7 @@
           "name": "is_read",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": false
         },
         "created_at": {
@@ -221,10 +180,10 @@
           "columns": [
             {
               "expression": "conversation_id",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
+              "opclass": "text_ops"
             }
           ],
           "isUnique": false,
@@ -237,10 +196,10 @@
           "columns": [
             {
               "expression": "sender_id",
+              "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops",
-              "isExpression": false
+              "opclass": "text_ops"
             }
           ],
           "isUnique": false,
@@ -254,7 +213,6 @@
           "name": "messages_conversation_id_fkey",
           "tableFrom": "messages",
           "tableTo": "conversations",
-          "schemaTo": "public",
           "columnsFrom": [
             "conversation_id"
           ],
@@ -268,21 +226,72 @@
           "name": "messages_sender_id_fkey",
           "tableFrom": "messages",
           "tableTo": "users",
-          "schemaTo": "public",
           "columnsFrom": [
             "sender_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "device_fingerprint": {
+          "name": "device_fingerprint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "public_key": {
+          "name": "public_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_device_fingerprint_unique": {
+          "name": "users_device_fingerprint_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "device_fingerprint"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
@@ -293,11 +302,8 @@
   "policies": {},
   "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
     "tables": {}
   }
 }

@@ -2,8 +2,16 @@
 import dotenv from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
 
-const envPath = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env';
+const envPath = process.env.NODE_ENV
+  ? `.env.${process.env.NODE_ENV}`
+  : '.env.local';
 dotenv.config({ path: envPath });
+
+console.log({
+  environment: process.env.NODE_ENV,
+  usingEnvFile: envPath,
+  databaseUrl: process.env.DATABASE_URL,
+});
 
 export default defineConfig({
   schema: './src/database/dbSchemas.ts',

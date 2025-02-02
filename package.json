@@ -11,6 +11,10 @@
     "dev": "tsx watch src/server.ts",
     "format": "prettier --write .",
     "db:introspect": "drizzle-kit introspect",
+    "db:drop": "drizzle-kit drop",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:migrate:prod": "set NODE_ENV=production&&npm run db:migrate",
     "db:push": "drizzle-kit push",
     "db:push:prod": "set NODE_ENV=production&&npm run db:push"
   },
