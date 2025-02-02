@@ -16,11 +16,6 @@ export const handleMessage = async (
     cb(false);
     return;
   }
-  console.info('Message received:', {
-    userId: socket.data.userId,
-    message,
-    socketId: socket.id,
-  });
 
   const validatedMessage = res.data;
 

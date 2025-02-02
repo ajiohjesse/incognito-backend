@@ -7,7 +7,6 @@ export const handleConnection = async (socket: SocketType, io: ServerType) => {
 
   // Always update socket ID for the user
   userSocketMap.set(userId, socket.id);
-  console.info('User connected:', { userId, socketId: socket.id });
 
   const conversations = await getUserConversations(userId);
   const activeFriends = conversations.reduce((active, conv) => {
@@ -38,6 +37,4 @@ export const handleDisconnect = (socket: SocketType, io: ServerType) => {
       io.to(friendSocketId).emit('friend:disconnect', userId);
     }
   });
-
-  console.info('User disconnected:', { userId, socketId: socket.id });
 };

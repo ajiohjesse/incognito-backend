@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import morgan from 'morgan';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import { messageRoute } from './routes/messageRoute';
 import { userRoute } from './routes/userRoute';
@@ -19,6 +20,7 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
+app.use(morgan(env.isProduction ? 'combined' : 'dev'));
 app.get('/health-check', healthRoute);
 app.use(globalLimiter);
 
