@@ -1,8 +1,10 @@
 import * as messageService from '@/services/messageService';
 import { RequestValidator } from '@/utils/requestValidator';
 import { sendResponse } from '@/utils/response';
-import { firstMessageSchema } from '@/validators/messageValidators';
-import type { UserDetailsDTO } from '@/validators/userValidators';
+import {
+  firstAuthenticatedMessageSchema,
+  firstMessageSchema,
+} from '@/validators/messageValidators';
 import type { RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
@@ -35,17 +37,14 @@ export const getConversationMessages: RequestHandler = async (req, res) => {
 };
 
 export const getActiveConversation: RequestHandler = async (req, res) => {
-  const { senderId, receiverId } = RequestValidator.validateParams(
+  const { conversationId } = RequestValidator.validateParams(
     req.params,
     z.object({
-      senderId: z.string().trim().min(1, 'Sender id is required'),
-      receiverId: z.string().trim().min(1, 'Receiver id is required'),
+      conversationId: z.string().trim().min(1, 'Sender id is required'),
     })
   );
-  const conversation = await messageService.getActiveConversation(
-    senderId,
-    receiverId
-  );
+  const conversation =
+    await messageService.getActiveConversation(conversationId);
   sendResponse(res, {
     type: 'success',
     statusCode: StatusCodes.OK,
@@ -59,11 +58,88 @@ export const sendFirstMessage: RequestHandler = async (req, res) => {
     req.body,
     firstMessageSchema
   );
-  const user = await messageService.sendFirstMessage(firstMessage);
-  sendResponse<UserDetailsDTO>(res, {
+  const convo = await messageService.sendFirstMessage(firstMessage);
+  sendResponse(res, {
     type: 'success',
     statusCode: StatusCodes.OK,
     message: 'User details',
-    data: user,
+    data: {
+      conversationId: convo.id,
+    },
+  });
+};
+
+export const getMessages: RequestHandler = async (_req, res) => {
+  const userId = res.locals.userId;
+  const messages = await messageService.getMessages(userId);
+  sendResponse(res, {
+    type: 'success',
+    statusCode: StatusCodes.OK,
+    message: 'Messages',
+    data: {
+      messages: messages.map(message => ({
+        ...message.message,
+        senderUsername: message.sender.username,
+        userSharedKeyEncrypted:
+          message.conversation.user1Id === userId
+            ? message.conversation.sharedKeyEncryptedByUser1
+            : message.conversation.sharedKeyEncryptedByUser2,
+      })),
+    },
+  });
+};
+
+export const getConversationWithFriend: RequestHandler = async (req, res) => {
+  const userId = res.locals.userId;
+  const { friendId } = RequestValidator.validateParams(
+    req.params,
+    z.object({
+      friendId: z.string().trim().min(1, 'Friend id is required'),
+    })
+  );
+
+  const conversation = await messageService.getConversationWithFriend(
+    userId,
+    friendId
+  );
+
+  sendResponse(res, {
+    type: 'success',
+    statusCode: StatusCodes.OK,
+    message: 'Conversation',
+    data: {
+      conversation: conversation ?? null,
+    },
+  });
+};
+
+export const firstAuthenticatedMessage: RequestHandler = async (req, res) => {
+  const userId = res.locals.userId;
+  const data = RequestValidator.validateBody(
+    req.body,
+    firstAuthenticatedMessageSchema
+  );
+
+  if (userId === data.friendId) {
+    sendResponse(res, {
+      type: 'error',
+      statusCode: StatusCodes.BAD_REQUEST,
+      message: 'You cannot send a message to yourself',
+    });
+    return;
+  }
+
+  const conversation = await messageService.firstAuthenticatedMessage(
+    userId,
+    data
+  );
+
+  sendResponse(res, {
+    type: 'success',
+    statusCode: StatusCodes.OK,
+    message: 'Message sent',
+    data: {
+      conversation,
+    },
   });
 };

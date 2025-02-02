@@ -6,6 +6,7 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import { errorMiddleware } from './middleware/errorMiddleware';
+import { messageRoute } from './routes/messageRoute';
 import { userRoute } from './routes/userRoute';
 
 const app = express();
@@ -18,10 +19,11 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
-app.use(healthRoute);
+app.get('/health-check', healthRoute);
 app.use(globalLimiter);
 
-app.use('/user', userRoute);
+app.use('/users', userRoute);
+app.use('/conversations', messageRoute);
 
 app.use(errorMiddleware);
 

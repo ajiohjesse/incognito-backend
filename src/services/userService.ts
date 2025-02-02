@@ -19,6 +19,10 @@ export function getUserByFingerprint(deviceFingerprint: string) {
 }
 
 export async function createUser(user: CreateUserDTO) {
+  const existingUser = await getUserByFingerprint(user.deviceFingerprint);
+  if (existingUser) {
+    return existingUser;
+  }
   const [createdUser] = await db.insert(users).values(user).returning();
   return createdUser;
 }

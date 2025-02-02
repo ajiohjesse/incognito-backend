@@ -1,3 +1,4 @@
+import { generateUserId } from '@/utils/nanoid';
 import { sql } from 'drizzle-orm';
 import {
   boolean,
@@ -8,16 +9,12 @@ import {
   timestamp,
   unique,
 } from 'drizzle-orm/pg-core';
-import { customAlphabet } from 'nanoid';
 import { generateUsername } from 'unique-username-generator';
-const alphabet =
-  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-const nanoid = customAlphabet(alphabet, 8);
 
 export const users = pgTable(
   'users',
   {
-    id: text().$defaultFn(nanoid).primaryKey().notNull(),
+    id: text().$defaultFn(generateUserId).primaryKey().notNull(),
     username: text()
       .$defaultFn(() => generateUsername('-', 3))
       .notNull(),
@@ -88,6 +85,7 @@ export const messages = pgTable(
     conversationId: text('conversation_id').notNull(),
     senderId: text('sender_id').notNull(),
     contentEncrypted: text('content_encrypted').notNull(),
+    encryptionIV: text('encryption_iv').notNull(),
     isDelivered: boolean('is_read').default(false).notNull(),
     createdAt: timestamp('created_at', { mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
@@ -111,6 +109,6 @@ export const messages = pgTable(
       columns: [table.senderId],
       foreignColumns: [users.id],
       name: 'messages_sender_id_fkey',
-    }).onDelete('set null'),
+    }).onDelete('cascade'),
   ]
 );

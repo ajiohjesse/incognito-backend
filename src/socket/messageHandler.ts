@@ -24,11 +24,22 @@ export const handleMessage = async (
 
   const friendSocketId = userSocketMap.get(validatedMessage.receiverId);
   if (friendSocketId) {
-    io.to(friendSocketId).emit('friend:message', validatedMessage);
+    const id = crypto.randomUUID();
+    io.to(friendSocketId).emit('friend:message', {
+      id,
+      senderId: socket.data.userId,
+      contentEncrypted: validatedMessage.contentEncrypted,
+      encryptionIV: validatedMessage.encryptionIV,
+      createdAt: validatedMessage.createdAt,
+      conversationId: validatedMessage.conversationId,
+      isDelivered: false,
+    });
     await db.insert(messages).values({
+      id,
       conversationId: validatedMessage.conversationId,
       senderId: socket.data.userId,
       contentEncrypted: validatedMessage.contentEncrypted,
+      encryptionIV: validatedMessage.encryptionIV,
       createdAt: validatedMessage.createdAt,
     });
   }

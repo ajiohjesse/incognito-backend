@@ -1,11 +1,11 @@
-import type { SocketMessageDTO } from '@/validators/messageValidators';
+import { messages } from '@/database/dbSchemas';
 import { Server, Socket } from 'socket.io';
 
 interface ServerToClientEvents {
   'friends:online': (friends: string[]) => void;
   'friend:disconnect': (friendId: string) => void;
   'friend:connect': (friendId: string) => void;
-  'friend:message': (message: SocketMessageDTO) => void;
+  'friend:message': (message: typeof messages.$inferSelect) => void;
   'friend:typing': (friendId: string) => void;
   'friend:stopTyping': (friendId: string) => void;
 }

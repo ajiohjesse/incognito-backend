@@ -7,3 +7,4 @@ export { route as userRoute };
 
 route.post('/', userController.createUser);
 route.get('/', authMiddleware, userController.getUser);
+route.get('/handshake/:id', userController.handshake);
