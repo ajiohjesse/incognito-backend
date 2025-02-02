@@ -7,7 +7,9 @@ Incognito is a secure, private, and anonymous messenger that allows you to commu
 ## Features
 
 - End-to-end encryption for secure messaging
+- Real-time messaging
 - Anonymous messaging
+- Anonymous replies
 - No registration required
 - No data collection
 - No third-party dependencies
