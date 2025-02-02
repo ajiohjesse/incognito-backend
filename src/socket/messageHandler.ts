@@ -6,12 +6,14 @@ import { userSocketMap } from './utils';
 
 export const handleMessage = async (
   message: unknown,
+  cb: (sent: boolean) => void,
   socket: SocketType,
   io: ServerType
 ) => {
   const res = socketMessageSchema.safeParse(message);
   if (!res.success) {
     console.error('Invalid message:', res.error);
+    cb(false);
     return;
   }
   console.info('Message received:', {
@@ -22,27 +24,25 @@ export const handleMessage = async (
 
   const validatedMessage = res.data;
 
+  const [createdMessage] = await db
+    .insert(messages)
+    .values({
+      conversationId: validatedMessage.conversationId,
+      senderId: socket.data.userId,
+      contentEncrypted: validatedMessage.contentEncrypted,
+      encryptionIV: validatedMessage.encryptionIV,
+      createdAt: validatedMessage.createdAt,
+    })
+    .returning();
+
   const friendSocketId = userSocketMap.get(validatedMessage.receiverId);
   if (friendSocketId) {
-    const id = crypto.randomUUID();
     io.to(friendSocketId).emit('friend:message', {
-      id,
-      senderId: socket.data.userId,
-      contentEncrypted: validatedMessage.contentEncrypted,
-      encryptionIV: validatedMessage.encryptionIV,
-      createdAt: validatedMessage.createdAt,
-      conversationId: validatedMessage.conversationId,
-      isDelivered: false,
-    });
-    await db.insert(messages).values({
-      id,
-      conversationId: validatedMessage.conversationId,
-      senderId: socket.data.userId,
-      contentEncrypted: validatedMessage.contentEncrypted,
-      encryptionIV: validatedMessage.encryptionIV,
-      createdAt: validatedMessage.createdAt,
+      conversationId: createdMessage.conversationId,
     });
   }
+
+  cb(true);
 };
 
 export const handleIsTyping = (

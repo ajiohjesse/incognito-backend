@@ -1,23 +1,23 @@
-import { messages } from '@/database/dbSchemas';
 import { Server, Socket } from 'socket.io';
 
 interface ServerToClientEvents {
   'friends:online': (friends: string[]) => void;
   'friend:disconnect': (friendId: string) => void;
   'friend:connect': (friendId: string) => void;
-  'friend:message': (message: typeof messages.$inferSelect) => void;
+  'friend:message': (message: { conversationId: string }) => void;
   'friend:typing': (friendId: string) => void;
   'friend:stopTyping': (friendId: string) => void;
 }
 
 interface ClientToServerEvents {
-  'user:message': (message: unknown) => void;
+  'user:message': (message: unknown, cb: (sent: boolean) => void) => void;
   'user:typing': (friendId: unknown) => void;
   'user:stopTyping': (friendId: unknown) => void;
 }
 
 export interface SocketData {
   userId: string;
+  username: string;
   activeFriends: string[];
 }
 

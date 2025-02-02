@@ -25,7 +25,9 @@ io.on('connection', async (socket: SocketType) => {
     await handleConnection(socket, io);
 
     socket.on('disconnect', () => handleDisconnect(socket, io));
-    socket.on('user:message', message => handleMessage(message, socket, io));
+    socket.on('user:message', (message, cb) =>
+      handleMessage(message, cb, socket, io)
+    );
     socket.on('user:typing', friendId => handleIsTyping(friendId, socket, io));
     socket.on('user:stopTyping', friendId =>
       handleStopTyping(friendId, socket, io)

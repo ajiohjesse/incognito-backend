@@ -24,7 +24,7 @@ export const socketMessageSchema = z.object({
   receiverId: z.string().trim().min(1, 'Receiver id is required'),
   contentEncrypted: z.string().trim().min(1, 'Message content is required'),
   encryptionIV: z.string().trim().min(1, 'Encryption IV is required'),
-  createdAt: z.string().date(),
+  createdAt: z.string().datetime(),
 });
 
 export type SocketMessageDTO = z.infer<typeof socketMessageSchema>;

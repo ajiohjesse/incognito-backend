@@ -13,5 +13,6 @@ export const authenticateSocket = async (socket: SocketType) => {
   }
 
   socket.data.userId = user.id;
+  socket.data.username = user.username;
   return user;
 };
