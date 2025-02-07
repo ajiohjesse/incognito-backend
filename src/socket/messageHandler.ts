@@ -26,7 +26,6 @@ export const handleMessage = async (
       senderId: socket.data.userId,
       contentEncrypted: validatedMessage.contentEncrypted,
       encryptionIV: validatedMessage.encryptionIV,
-      createdAt: validatedMessage.createdAt,
     })
     .returning();
 

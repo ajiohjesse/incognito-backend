@@ -1,4 +1,5 @@
 import { generateUserId } from '@/utils/nanoid';
+import { generateUsername } from '@/utils/usernameGenerator';
 import { sql } from 'drizzle-orm';
 import {
   boolean,
@@ -9,15 +10,12 @@ import {
   timestamp,
   unique,
 } from 'drizzle-orm/pg-core';
-import { generateUsername } from 'unique-username-generator';
 
 export const users = pgTable(
   'users',
   {
     id: text().$defaultFn(generateUserId).primaryKey().notNull(),
-    username: text()
-      .$defaultFn(() => generateUsername('-', 3))
-      .notNull(),
+    username: text().$defaultFn(generateUsername).notNull(),
     deviceFingerprint: text('device_fingerprint').notNull().unique(),
     publicKey: text('public_key').notNull(),
     createdAt: timestamp('created_at', { mode: 'string' })
