@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import { cleanEnv, port, str } from 'envalid';
 
-const envPath = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env';
+const envPath = process.env.NODE_ENV
+  ? `.env.${process.env.NODE_ENV}`
+  : '.env.local';
 dotenv.config({ path: envPath });
 
 export const env = cleanEnv(process.env, {
