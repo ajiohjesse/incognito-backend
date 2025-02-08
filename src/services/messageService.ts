@@ -144,7 +144,8 @@ export function getMessages(userId: string) {
         ne(messages.senderId, userId)
       )
     )
-    .orderBy(desc(messages.createdAt));
+    .orderBy(desc(messages.createdAt))
+    .limit(100);
 }
 
 export function getConversationWithFriend(userId: string, friendId: string) {

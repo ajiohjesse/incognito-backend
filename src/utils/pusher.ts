@@ -19,7 +19,7 @@ export function sendNewMessagePushNotification({
     web: {
       notification: {
         title: 'New message',
-        body: `You have a new message from ${fromUsername}`,
+        body: `You have a new anonymous message from ${fromUsername}`,
         deep_link: `${env.CORS_ORIGIN}/u/messages/${conversationId}`,
       },
     },

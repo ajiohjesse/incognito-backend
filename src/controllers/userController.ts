@@ -70,8 +70,18 @@ export const handshake: RequestHandler = async (req, res, next) => {
   });
 };
 
-export const getPusherToken: RequestHandler = (req, res) => {
+export const getPusherToken: RequestHandler = (_, res) => {
   const userId = res.locals.userId;
   const beamsToken = beamsClient.generateToken(userId);
   res.send(JSON.stringify(beamsToken));
+};
+
+export const deleteUser: RequestHandler = async (_, res) => {
+  await userService.deleteUser(res.locals.userId);
+  beamsClient.deleteUser(res.locals.userId);
+  sendResponse(res, {
+    type: 'success',
+    message: 'User deleted',
+    statusCode: StatusCodes.NO_CONTENT,
+  });
 };

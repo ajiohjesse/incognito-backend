@@ -35,3 +35,13 @@ export async function createUser(user: CreateUserDTO) {
   const [createdUser] = await db.insert(users).values(user).returning();
   return createdUser;
 }
+
+export async function deleteUser(userId: string) {
+  await db
+    .update(users)
+    .set({
+      deviceFingerprint: crypto.randomUUID(),
+      deletedAt: sql`CURRENT_TIMESTAMP`,
+    })
+    .where(eq(users.id, userId));
+}

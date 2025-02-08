@@ -6,6 +6,7 @@ const route = Router();
 export { route as userRoute };
 
 route.post('/', userController.createUser);
+route.delete('/', authMiddleware, userController.deleteUser);
 route.get('/', authMiddleware, userController.getUser);
 route.get('/handshake/:id', userController.handshake);
 route.get('/pusher-token', authMiddleware, userController.getPusherToken);
