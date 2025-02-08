@@ -31,5 +31,6 @@ export const authMiddleware: RequestHandler = async (req, res, next) => {
   }
   res.locals.userId = user.id;
   res.locals.deviceFingerprint = user.deviceFingerprint;
+  res.locals.username = user.username;
   next();
 };

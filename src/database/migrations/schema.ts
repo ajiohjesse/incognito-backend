@@ -21,6 +21,7 @@ export const users = pgTable(
     createdAt: timestamp('created_at', { mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
+    deletedAt: timestamp('deleted_at', { mode: 'string' }).default(sql`NULL`),
   },
   table => [
     {

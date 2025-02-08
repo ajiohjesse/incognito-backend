@@ -1,23 +1,35 @@
 import { db } from '@/database';
 import { messages } from '@/database/dbSchemas';
+import { sendNewMessagePushNotification } from '@/utils/pusher';
 import { socketMessageSchema } from '@/validators/messageValidators';
 import type { ServerType, SocketType } from './types';
 import { userSocketMap } from './utils';
 
 export const handleMessage = async (
   message: unknown,
-  cb: (sent: boolean) => void,
+  cb: (sent: boolean, message?: string) => void,
   socket: SocketType,
   io: ServerType
 ) => {
   const res = socketMessageSchema.safeParse(message);
   if (!res.success) {
-    console.error('Invalid message:', res.error);
-    cb(false);
+    cb(false, 'Invalid message');
     return;
   }
 
   const validatedMessage = res.data;
+
+  const receiver = await db.query.users.findFirst({
+    where: (table, fn) => fn.eq(table.id, validatedMessage.receiverId),
+  });
+
+  if (!receiver || receiver.deletedAt !== null) {
+    cb(
+      false,
+      'The acount your are trying to message does not exist or may have been deleted.'
+    );
+    return;
+  }
 
   const [createdMessage] = await db
     .insert(messages)
@@ -35,6 +47,12 @@ export const handleMessage = async (
       conversationId: createdMessage.conversationId,
     });
   }
+
+  sendNewMessagePushNotification({
+    targetUserId: receiver.id,
+    fromUsername: socket.data.username,
+    conversationId: createdMessage.conversationId,
+  });
 
   cb(true);
 };

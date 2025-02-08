@@ -5,6 +5,7 @@ declare global {
     interface Locals {
       userId: string;
       deviceFingerprint: string;
+      username: string;
     }
   }
 }

@@ -1,6 +1,7 @@
 import * as messageService from '@/services/messageService';
 import { io } from '@/socket';
 import { userSocketMap } from '@/socket/utils';
+import { sendNewMessagePushNotification } from '@/utils/pusher';
 import { RequestValidator } from '@/utils/requestValidator';
 import { sendResponse } from '@/utils/response';
 import {
@@ -60,13 +61,36 @@ export const sendFirstMessage: RequestHandler = async (req, res) => {
     req.body,
     firstMessageSchema
   );
-  const convo = await messageService.sendFirstMessage(firstMessage);
+  const { conversation, user } =
+    await messageService.sendFirstMessage(firstMessage);
+  const userId = user.id;
+
+  //emit socket event
+  const friendId =
+    conversation.user1Id === userId
+      ? conversation.user2Id
+      : conversation.user1Id;
+
+  const friendSocketId = userSocketMap.get(friendId);
+  if (friendSocketId) {
+    io.to(friendSocketId).emit('friend:message', {
+      conversationId: conversation.id,
+    });
+  }
+
+  //send push notification
+  sendNewMessagePushNotification({
+    targetUserId: friendId,
+    fromUsername: user.username,
+    conversationId: conversation.id,
+  });
+
   sendResponse(res, {
     type: 'success',
     statusCode: StatusCodes.OK,
     message: 'User details',
     data: {
-      conversationId: convo.id,
+      conversationId: conversation.id,
     },
   });
 };
@@ -136,6 +160,7 @@ export const firstAuthenticatedMessage: RequestHandler = async (req, res) => {
     data
   );
 
+  //emit socket event
   const friendId =
     conversation.user1Id === userId
       ? conversation.user2Id
@@ -147,6 +172,13 @@ export const firstAuthenticatedMessage: RequestHandler = async (req, res) => {
       conversationId: conversation.id,
     });
   }
+
+  //send push notification
+  sendNewMessagePushNotification({
+    targetUserId: friendId,
+    fromUsername: res.locals.username,
+    conversationId: conversation.id,
+  });
 
   sendResponse(res, {
     type: 'success',

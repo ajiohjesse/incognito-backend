@@ -1,10 +1,11 @@
 import { db } from '@/database';
 import { conversations, messages, users } from '@/database/dbSchemas';
+import { PublicError } from '@/utils/error';
 import type {
   FirstAuthenticatedMessageDTO,
   FirstMessageDTO,
 } from '@/validators/messageValidators';
-import { and, desc, eq, ne, or } from 'drizzle-orm';
+import { and, desc, eq, ne, or, sql } from 'drizzle-orm';
 import { createUser } from './userService';
 
 export function getUserConversations(userId: string) {
@@ -31,6 +32,7 @@ export function getUserConversations(userId: string) {
         },
       },
     },
+    orderBy: (table, fn) => fn.desc(table.createdAt),
   });
 }
 
@@ -64,6 +66,7 @@ export function getActiveConversation(conversationId: string) {
   });
 }
 
+//sends a message and automatically creates an account
 export async function sendFirstMessage(message: FirstMessageDTO) {
   const {
     contentEncrypted,
@@ -75,11 +78,28 @@ export async function sendFirstMessage(message: FirstMessageDTO) {
     encryptionIV,
   } = message;
 
-  //clear the previous user record if it exists
+  const receipent = await db.query.users.findFirst({
+    where: (table, fn) => fn.eq(table.id, receipientId),
+  });
+
+  if (!receipent || receipent.deletedAt !== null) {
+    throw new PublicError(
+      404,
+      'The acount you are trying to message does not exist or may have been deleted.'
+    );
+  }
+
+  //soft delete the previous user record if it exists
   //this is because auth is based on deviceFingerprint
   //and the conversation private keys are stored on the client
   //and can be lost at any time
-  await db.delete(users).where(eq(users.deviceFingerprint, deviceFingerprint));
+  await db
+    .update(users)
+    .set({
+      deviceFingerprint: crypto.randomUUID(),
+      deletedAt: sql`CURRENT_TIMESTAMP`,
+    })
+    .where(eq(users.deviceFingerprint, deviceFingerprint));
   const user = await createUser({ deviceFingerprint, publicKey });
 
   const [conversation] = await db
@@ -99,7 +119,7 @@ export async function sendFirstMessage(message: FirstMessageDTO) {
     encryptionIV,
   });
 
-  return conversation;
+  return { conversation, user };
 }
 
 export function getMessages(userId: string) {
@@ -142,6 +162,17 @@ export async function firstAuthenticatedMessage(
   userId: string,
   data: FirstAuthenticatedMessageDTO
 ) {
+  const receipent = await db.query.users.findFirst({
+    where: (table, fn) => fn.eq(table.id, data.friendId),
+  });
+
+  if (!receipent || receipent.deletedAt !== null) {
+    throw new PublicError(
+      404,
+      'The acount you are trying to message does not exist or may have been deleted.'
+    );
+  }
+
   const [conversation] = await db
     .insert(conversations)
     .values({

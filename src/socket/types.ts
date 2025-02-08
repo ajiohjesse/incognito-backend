@@ -10,7 +10,10 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
-  'user:message': (message: unknown, cb: (sent: boolean) => void) => void;
+  'user:message': (
+    message: unknown,
+    cb: (sent: boolean, message?: string) => void
+  ) => void;
   'user:typing': (friendId: unknown) => void;
   'user:stopTyping': (friendId: unknown) => void;
 }

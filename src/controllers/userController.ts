@@ -1,4 +1,5 @@
 import * as userService from '@/services/userService';
+import { beamsClient } from '@/utils/pusher';
 import { RequestValidator } from '@/utils/requestValidator';
 import { sendResponse } from '@/utils/response';
 import {
@@ -27,23 +28,11 @@ export const getUser: RequestHandler = async (req, res) => {
   });
 };
 
-export const createUser: RequestHandler = async (req, res, next) => {
+export const createUser: RequestHandler = async (req, res) => {
   const { deviceFingerprint, publicKey } = RequestValidator.validateBody(
     req.body,
     createUserSchema
   );
-
-  const user = await userService.getUserByFingerprint(deviceFingerprint);
-  if (user) {
-    sendResponse<UserDetailsDTO>(res, {
-      type: 'success',
-      statusCode: StatusCodes.OK,
-      message: 'User details',
-      data: user,
-    });
-
-    return;
-  }
 
   const createdUser = await userService.createUser({
     deviceFingerprint,
@@ -61,7 +50,7 @@ export const createUser: RequestHandler = async (req, res, next) => {
 export const handshake: RequestHandler = async (req, res, next) => {
   const id = req.params.id as string;
   const user = await userService.getUserById(id);
-  if (!user) {
+  if (!user || user.deletedAt !== null) {
     sendResponse(res, {
       type: 'error',
       statusCode: StatusCodes.NOT_FOUND,
@@ -79,4 +68,10 @@ export const handshake: RequestHandler = async (req, res, next) => {
       username: user.username,
     },
   });
+};
+
+export const getPusherToken: RequestHandler = (req, res) => {
+  const userId = res.locals.userId;
+  const beamsToken = beamsClient.generateToken(userId);
+  res.send(JSON.stringify(beamsToken));
 };

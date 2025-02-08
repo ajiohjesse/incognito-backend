@@ -4,6 +4,7 @@ import { env } from '@/utils/env';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import 'express-async-errors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { errorMiddleware } from './middleware/errorMiddleware';

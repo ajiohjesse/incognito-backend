@@ -16,4 +16,6 @@ export const env = cleanEnv(process.env, {
   }),
   CORS_ORIGIN: str(),
   DATABASE_URL: str(),
+  PUSHER_ID: str(),
+  PUSHER_SECRET: str(),
 });
