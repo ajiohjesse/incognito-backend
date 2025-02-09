@@ -43,9 +43,7 @@ export const handleMessage = async (
 
   const friendSocketId = userSocketMap.get(validatedMessage.receiverId);
   if (friendSocketId) {
-    io.to(friendSocketId).emit('friend:message', {
-      conversationId: createdMessage.conversationId,
-    });
+    io.to(friendSocketId).emit('friend:message', createdMessage);
   }
 
   sendNewMessagePushNotification({
