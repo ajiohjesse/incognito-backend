@@ -1,4 +1,4 @@
-import { sendPaginatedResponse, sendResponse } from '@/utils/response';
+import { sendResponse } from '@/utils/response';
 import rateLimit from 'express-rate-limit';
 import { StatusCodes } from 'http-status-codes';
 
@@ -14,17 +14,6 @@ export const globalLimiter = rateLimit({
       type: 'error',
       statusCode: StatusCodes.TOO_MANY_REQUESTS,
       message: 'Rate limit exceeded',
-    });
-
-    sendPaginatedResponse(res, {
-      message: 'Success',
-      data: {
-        items: [],
-        page: 1,
-        limit: 10,
-        totalItems: 0,
-        totalPages: 0,
-      },
     });
   },
 });

@@ -86,12 +86,8 @@
           "name": "conversations_user1_id_fkey",
           "tableFrom": "conversations",
           "tableTo": "users",
-          "columnsFrom": [
-            "user1_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user1_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -99,12 +95,8 @@
           "name": "conversations_user2_id_fkey",
           "tableFrom": "conversations",
           "tableTo": "users",
-          "columnsFrom": [
-            "user2_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user2_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -114,10 +106,7 @@
         "conversations_user1_id_user2_id_key": {
           "name": "conversations_user1_id_user2_id_key",
           "nullsNotDistinct": false,
-          "columns": [
-            "user1_id",
-            "user2_id"
-          ]
+          "columns": ["user1_id", "user2_id"]
         }
       },
       "policies": {},
@@ -213,12 +202,8 @@
           "name": "messages_conversation_id_fkey",
           "tableFrom": "messages",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "conversation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["conversation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -226,12 +211,8 @@
           "name": "messages_sender_id_fkey",
           "tableFrom": "messages",
           "tableTo": "users",
-          "columnsFrom": [
-            "sender_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["sender_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -285,9 +266,7 @@
         "users_device_fingerprint_unique": {
           "name": "users_device_fingerprint_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "device_fingerprint"
-          ]
+          "columns": ["device_fingerprint"]
         }
       },
       "policies": {},
